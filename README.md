@@ -14,7 +14,7 @@ This README provides step-by-step instructions for setting up a Raspberry Pi and
 
 ---
 
-## Raspberry Pi Setup
+## Raspberry Pi Setup [1]
 
 ### Installing Raspberry Pi OS
 
