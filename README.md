@@ -1,6 +1,6 @@
 # Raspberry Pi Setup and C++ Project Configuration
 
-This README provides step-by-step instructions for setting up a Raspberry Pi and configuring the C++ project foe the eeg wheelchair.
+This README provides step-by-step instructions for setting up a Raspberry Pi and configuring the C++ project for the eeg wheelchair.
 
 ## Table of Contents
 
@@ -94,5 +94,5 @@ $ ./post_process
 
 ## References
 
-- [How to set up a headless Raspberry Pi, without ever attaching a monitor](https://www.tomshardware.com/reviews/raspberry-pi-headless-setup-how-to,6028.html) - A. Piltch, Tom’s Hardware, accessed Oct. 22, 2023.
+[1] [How to set up a headless Raspberry Pi, without ever attaching a monitor](https://www.tomshardware.com/reviews/raspberry-pi-headless-setup-how-to,6028.html) - A. Piltch, Tom’s Hardware, accessed Oct. 22, 2023.
 
