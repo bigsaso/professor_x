@@ -1,0 +1,11 @@
+# Ignorign CMakeCache
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+Makefile
+# Ignoring any csv generated
+*.csv
+# Ignoring any .edf dataset used in Fall semester
+*.edf
+# Ignoring compiled code
+post_process
