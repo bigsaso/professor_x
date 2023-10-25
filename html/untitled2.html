@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>untitled2</title>
+<meta name="generator" content="MATLAB 23.2">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2023-10-02">
+<meta name="DC.source" content="untitled2.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<h2>Contents</h2>
+<div>
+<ul>
+<li>
+<a href="#1">Define Experiments and Files</a>
+</li>
+<li>
+<a href="#2">Read .edfs and extract Fpz_ values</a>
+</li>
+<li>
+<a href="#3">Plot all signals</a>
+</li>
+<li>
+<a href="#4">Plot spectograms</a>
+</li>
+<li>
+<a href="#5">Design low pass filter and filter all signals</a>
+</li>
+<li>
+<a href="#7">Compensating for the delay</a>
+</li>
+<li>
+<a href="#8">Plotting the differences between original, filtered, and delay compensated signals</a>
+</li>
+<li>
+<a href="#9">Plotting the peaks</a>
+</li>
+</ul>
+</div>
+<h2 id="1">Define Experiments and Files</h2>
+<p>Task 1: Baseline, eyes open Task 2: Baseline, eyes closed Task 3: open and close left or right fist Task 4: imagine opening and closing left or right fist Task 5: open and close both fists or both feet Task 6: imagine opening and closing both fists or both feet</p>
+<pre class="codeinput">experiments = [<span class="string">"Baseline, eyes open"</span> <span class="string">"Baseline, eyes closed"</span> <span class="string">"Open and close left or right fist"</span> <span class="string">"Imagine opening and closing left or right fist"</span> <span class="string">"Open and close both fists or both feet"</span> <span class="string">"Imagine opening and closing both fists or both feet"</span> <span class="string">"Open and close left or right fist"</span> <span class="string">"Imagine opening and closing left or right fist"</span> <span class="string">"Open and close both fists or both feet"</span> <span class="string">"Imagine opening and closing both fists or both feet"</span> <span class="string">"Open and close left or right fist"</span> <span class="string">"Imagine opening and closing left or right fist"</span> <span class="string">"Open and close both fists or both feet"</span> <span class="string">"Imagine opening and closing both fists or both feet"</span>];
+<span class="comment">% Experiments run:</span>
+<span class="comment">% S001R01: Task 1</span>
+<span class="comment">% S001R02: Task 2</span>
+<span class="comment">% S001R03: Task 3</span>
+<span class="comment">% S001R04: Task 4</span>
+<span class="comment">% S001R05: Task 5</span>
+<span class="comment">% S001R06: Task 6</span>
+<span class="comment">% S001R07: Task 3</span>
+<span class="comment">% S001R08: Task 4</span>
+<span class="comment">% S001R09: Task 5</span>
+<span class="comment">% S001R10: Task 6</span>
+<span class="comment">% S001R11: Task 3</span>
+<span class="comment">% S001R12: Task 4</span>
+<span class="comment">% S001R13: Task 5</span>
+<span class="comment">% S001R14: Task 6</span>
+files = [<span class="string">"S001R01.edf"</span> <span class="string">"S001R01.edf"</span> <span class="string">"S001R03.edf"</span> <span class="string">"S001R04.edf"</span> <span class="string">"S001R05.edf"</span> <span class="string">"S001R06.edf"</span> <span class="string">"S001R07.edf"</span> <span class="string">"S001R08.edf"</span> <span class="string">"S001R09.edf"</span> <span class="string">"S001R10.edf"</span> <span class="string">"S001R11.edf"</span> <span class="string">"S001R12.edf"</span> <span class="string">"S001R13.edf"</span> <span class="string">"S001R14.edf"</span>];
+</pre>
+<h2 id="2">Read .edfs and extract Fpz_ values</h2>
+<pre class="codeinput">
+<span class="keyword">for</span> x = 1:14
+    <span class="comment">% Read .edfs</span>
+    file_name = files(1,x);
+    variable_name = sprintf(<span class="string">'task%d'</span>, x);
+    eval([variable_name, <span class="string">' = edfread(file_name);'</span>]);
+
+    <span class="comment">% Extract the 'Fpz_' data and assign it to 'taskX_fpz'</span>
+    eval([variable_name, <span class="string">'_fpz = vertcat('</span>, variable_name, <span class="string">'.Fpz_{:});'</span>]);
+
+    <span class="comment">% Clear the dummy variables</span>
+    clear <span class="string">file_name</span>
+    clear <span class="string">variable_name</span>
+    clear <span class="string">x</span>
+<span class="keyword">end</span>
+Fs = 160;
+</pre>
+<h2 id="3">Plot all signals</h2>
+<pre class="codeinput">figure;
+hold <span class="string">on</span>;
+<span class="keyword">for</span> x = 1:14
+    subplot(7, 2, x);
+    plot(eval([<span class="string">'task'</span>, num2str(x), <span class="string">'_fpz'</span>]), <span class="string">'k'</span>);
+    title(experiments(1,x));
+    xlabel(<span class="string">"time"</span>); ylabel(<span class="string">"mV"</span>);
+    grid <span class="string">on</span>;
+<span class="keyword">end</span>
+</pre>
+<img vspace="5" hspace="5" src="untitled2_01.png" alt=""> <h2 id="4">Plot spectograms</h2>
+<pre class="codeinput">figure;
+hold <span class="string">on</span>;
+<span class="keyword">for</span> x = 1:14
+    subplot(4, 4, x);
+    spectrogram(eval([<span class="string">'task'</span>, num2str(x), <span class="string">'_fpz'</span>]),[],[],[],Fs,<span class="string">'yaxis'</span>);
+    title(experiments(1,x));
+    xlabel(<span class="string">"time"</span>); ylabel(<span class="string">"mV"</span>);
+    grid <span class="string">on</span>;
+<span class="keyword">end</span>
+</pre>
+<img vspace="5" hspace="5" src="untitled2_02.png" alt=""> <h2 id="5">Design low pass filter and filter all signals</h2>
+<pre class="codeinput">digFilt = designfilt(<span class="string">'lowpassiir'</span>,<span class="string">'PassbandFrequency'</span>,0.5,<span class="string">'StopbandFrequency'</span>,4,<span class="string">'PassbandRipple'</span>,1,<span class="string">'StopbandAttenuation'</span>,60,<span class="string">'SampleRate'</span>,500);
+<span class="keyword">for</span> x = 1:14
+    variable_name = sprintf(<span class="string">'task%d_fpz_filtered'</span>, x);
+    eval([variable_name, <span class="string">' = filter(digFilt, task'</span>, num2str(x), <span class="string">'_fpz);'</span>]);
+<span class="keyword">end</span>
+</pre>
+<p>%% Plotting the delay of the lowpass filter grpdelay(digFilt,500,Fs)</p>
+<h2 id="7">Compensating for the delay</h2>
+<pre class="codeinput">
+<span class="keyword">for</span> x = 1:14
+    variable_name = sprintf(<span class="string">'task%d_fpz_delayCompensated'</span>, x);
+    eval([variable_name, <span class="string">' = filtfilt(digFilt, task'</span>, num2str(x), <span class="string">'_fpz);'</span>]);
+<span class="keyword">end</span>
+</pre>
+<h2 id="8">Plotting the differences between original, filtered, and delay compensated signals</h2>
+<pre class="codeinput">figure;
+<span class="keyword">for</span> x = 1:14
+    subplot(7, 2, x);
+    hold <span class="string">on</span>;
+    <span class="comment">% Plot the original signal in red</span>
+    plot(eval([<span class="string">'task'</span>, num2str(x), <span class="string">'_fpz'</span>]), <span class="string">'r'</span>);
+    <span class="comment">% Plot the filtered signal in blue</span>
+    plot(eval([<span class="string">'task'</span>, num2str(x), <span class="string">'_fpz_filtered'</span>]), <span class="string">'b'</span>);
+    <span class="comment">% Plot the filtered and delay-compensated signal in black</span>
+    plot(eval([<span class="string">'task'</span>, num2str(x), <span class="string">'_fpz_delayCompensated'</span>]), <span class="string">'k'</span>);
+    title(experiments(1,x));
+    legend(<span class="string">'Original Signal'</span>, <span class="string">'Filtered Signal'</span>, <span class="string">'Filtered and Delay Accounted Signal'</span>);
+    grid <span class="string">on</span>;
+    hold <span class="string">off</span>;
+<span class="keyword">end</span>
+</pre>
+<img vspace="5" hspace="5" src="untitled2_03.png" alt=""> <h2 id="9">Plotting the peaks</h2>
+<pre class="codeinput">figure;
+<span class="keyword">for</span> x = 1:14
+    subplot(7, 2, x);
+    findpeaks(eval([<span class="string">'task'</span>, num2str(x), <span class="string">'_fpz_delayCompensated'</span>]), Fs);
+    title([<span class="string">'Vertical Component - '</span>, experiments(1,x)]);
+    xlabel(<span class="string">'Time (sec)'</span>); ylabel(<span class="string">'Amplitude'</span>);
+<span class="keyword">end</span>
+</pre>
+<img vspace="5" hspace="5" src="untitled2_04.png" alt=""> <p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023b</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+%% Define Experiments and Files
+% Task 1: Baseline, eyes open
+% Task 2: Baseline, eyes closed
+% Task 3: open and close left or right fist
+% Task 4: imagine opening and closing left or right fist
+% Task 5: open and close both fists or both feet
+% Task 6: imagine opening and closing both fists or both feet
+experiments = ["Baseline, eyes open" "Baseline, eyes closed" "Open and close left or right fist" "Imagine opening and closing left or right fist" "Open and close both fists or both feet" "Imagine opening and closing both fists or both feet" "Open and close left or right fist" "Imagine opening and closing left or right fist" "Open and close both fists or both feet" "Imagine opening and closing both fists or both feet" "Open and close left or right fist" "Imagine opening and closing left or right fist" "Open and close both fists or both feet" "Imagine opening and closing both fists or both feet"];
+% Experiments run:
+% S001R01: Task 1
+% S001R02: Task 2
+% S001R03: Task 3
+% S001R04: Task 4
+% S001R05: Task 5
+% S001R06: Task 6
+% S001R07: Task 3
+% S001R08: Task 4
+% S001R09: Task 5
+% S001R10: Task 6
+% S001R11: Task 3
+% S001R12: Task 4
+% S001R13: Task 5
+% S001R14: Task 6
+files = ["S001R01.edf" "S001R01.edf" "S001R03.edf" "S001R04.edf" "S001R05.edf" "S001R06.edf" "S001R07.edf" "S001R08.edf" "S001R09.edf" "S001R10.edf" "S001R11.edf" "S001R12.edf" "S001R13.edf" "S001R14.edf"];
+%% Read .edfs and extract Fpz_ values
+for x = 1:14
+    % Read .edfs
+    file_name = files(1,x);
+    variable_name = sprintf('task%d', x);
+    eval([variable_name, ' = edfread(file_name);']);
+    
+    % Extract the 'Fpz_' data and assign it to 'taskX_fpz'
+    eval([variable_name, '_fpz = vertcat(', variable_name, '.Fpz_{:});']);
+    
+    % Clear the dummy variables
+    clear file_name
+    clear variable_name
+    clear x
+end
+Fs = 160;
+%% Plot all signals
+figure;
+hold on;
+for x = 1:14
+    subplot(7, 2, x);
+    plot(eval(['task', num2str(x), '_fpz']), 'k');
+    title(experiments(1,x));
+    xlabel("time"); ylabel("mV");
+    grid on;
+end
+%% Plot spectograms
+figure;
+hold on;
+for x = 1:14
+    subplot(4, 4, x);
+    spectrogram(eval(['task', num2str(x), '_fpz']),[],[],[],Fs,'yaxis');
+    title(experiments(1,x));
+    xlabel("time"); ylabel("mV");
+    grid on;
+end
+%% Design low pass filter and filter all signals
+digFilt = designfilt('lowpassiir','PassbandFrequency',0.5,'StopbandFrequency',4,'PassbandRipple',1,'StopbandAttenuation',60,'SampleRate',500);
+for x = 1:14
+    variable_name = sprintf('task%d_fpz_filtered', x);
+    eval([variable_name, ' = filter(digFilt, task', num2str(x), '_fpz);']);
+end
+%%
+% %% Plotting the delay of the lowpass filter
+% grpdelay(digFilt,500,Fs)
+%% Compensating for the delay
+for x = 1:14
+    variable_name = sprintf('task%d_fpz_delayCompensated', x);
+    eval([variable_name, ' = filtfilt(digFilt, task', num2str(x), '_fpz);']);
+end
+%% Plotting the differences between original, filtered, and delay compensated signals
+figure;
+for x = 1:14
+    subplot(7, 2, x);
+    hold on;
+    % Plot the original signal in red
+    plot(eval(['task', num2str(x), '_fpz']), 'r');
+    % Plot the filtered signal in blue
+    plot(eval(['task', num2str(x), '_fpz_filtered']), 'b');
+    % Plot the filtered and delay-compensated signal in black
+    plot(eval(['task', num2str(x), '_fpz_delayCompensated']), 'k');
+    title(experiments(1,x));
+    legend('Original Signal', 'Filtered Signal', 'Filtered and Delay Accounted Signal');
+    grid on;
+    hold off;
+end
+%% Plotting the peaks
+figure;
+for x = 1:14
+    subplot(7, 2, x);
+    findpeaks(eval(['task', num2str(x), '_fpz_delayCompensated']), Fs);
+    title(['Vertical Component - ', experiments(1,x)]);
+    xlabel('Time (sec)'); ylabel('Amplitude');
+end
+##### SOURCE END #####
+-->
+</body>
+</html>
