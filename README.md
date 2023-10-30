@@ -84,10 +84,11 @@ $ sudo make install
 
 ### Set-up to use in our C++ project
 
-1. Compile your C++ source file:<br />
+1. Set the correct FFTW directory in the CMakeLists.txt file.<br />
+2. Compile your C++ source file:<br />
 $ cmake .<br />
 $ make
-2. Run the code<br />
+3. Run the code<br />
 $ ./post_process
 
 ---
