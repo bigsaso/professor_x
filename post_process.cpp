@@ -7,7 +7,9 @@
 #include <fftw3.h>
 #include <map>
 #include <algorithm>
+//#include <opencv2/opencv.hpp>
 
+//using namespace cv;
 using namespace std;
 
 // Create struct for Hjorth parameters
@@ -238,6 +240,66 @@ std::vector<std::vector<std::complex<double>>> calculateSTFT(const std::vector<d
     return stftResult;
 }
 
+// Function to analyze and store analysis of the signal's FFTW in .csv file
+void storeFFTWAnalysistoCSV(std::vector<std::complex<double>> fftwResult, double deltaMin, double deltaMax, double thetaMin, double thetaMax, double alphaMin, double alphaMax, double betaMin, double betaMax, double gammaMin, double gammaMax, double muMin, double muMax){
+    std::ofstream outputFile("fftw_analysis.csv");
+    if(outputFile.is_open()){
+            // Write the header row
+            outputFile << "relative_delta_power,relative_theta_power,relative_alpha_power,relative_beta_power,relative_gamma_power,relative_mu_power\n";
+            // for (size_t i=0;i<stftResult.size();i++) {
+                int N = fftwResult.size();
+                // Calculate relative delta power
+                double fftwRelativeDeltaPower = calculateRelativePower(fftwResult, deltaMin, deltaMax, N);
+                // Calculate relative theta power
+                double fftwRelativeThetaPower = calculateRelativePower(fftwResult, thetaMin, thetaMax, N);
+                // Calculate relative alpha power
+                double fftwRelativeAlphaPower = calculateRelativePower(fftwResult, alphaMin, alphaMax, N);
+                // Calculate relative beta power
+                double fftwRelativeBetaPower = calculateRelativePower(fftwResult, betaMin, betaMax, N);
+                // Calculate relative gamma power
+                double fftwRelativeGammaPower = calculateRelativePower(fftwResult, gammaMin, gammaMax, N);
+                // Calculate relative mu power
+                double fftwRelativeMuPower = calculateRelativePower(fftwResult, muMin, muMax, N);
+                // Append to csv
+                outputFile << fftwRelativeDeltaPower << "," << fftwRelativeThetaPower << "," << fftwRelativeAlphaPower << "," << fftwRelativeBetaPower << "," << fftwRelativeGammaPower << "," << fftwRelativeMuPower << "\n";
+            // }
+            outputFile.close();
+            std::cout << "FFTW Analysis output written to fftw_analysis.csv successfully" << std::endl;
+    }else{
+        std:cerr << "Failed to open fftw_analysis.csv for writing." << std::endl;
+    }
+}
+
+// Function to analyze and store analysis of the signal's STFT in .csv file
+void storeSTFTAnalysistoCSV(std::vector<std::vector<std::complex<double>>> stftResult, double deltaMin, double deltaMax, double thetaMin, double thetaMax, double alphaMin, double alphaMax, double betaMin, double betaMax, double gammaMin, double gammaMax, double muMin, double muMax){
+    std::ofstream outputFile("stft_analysis.csv");
+    if(outputFile.is_open()){
+            // Write the header row
+            outputFile << "relative_delta_power,relative_theta_power,relative_alpha_power,relative_beta_power,relative_gamma_power,relative_mu_power\n";
+            for (size_t i=0;i<stftResult.size();i++) {
+                int N = stftResult[i].size();
+                // Calculate relative delta power
+                double stftRelativeDeltaPower = calculateRelativePower(stftResult[i], deltaMin, deltaMax, N);
+                // Calculate relative theta power
+                double stftRelativeThetaPower = calculateRelativePower(stftResult[i], thetaMin, thetaMax, N);
+                // Calculate relative alpha power
+                double stftRelativeAlphaPower = calculateRelativePower(stftResult[i], alphaMin, alphaMax, N);
+                // Calculate relative beta power
+                double stftRelativeBetaPower = calculateRelativePower(stftResult[i], betaMin, betaMax, N);
+                // Calculate relative gamma power
+                double stftRelativeGammaPower = calculateRelativePower(stftResult[i], gammaMin, gammaMax, N);
+                // Calculate relative mu power
+                double stftRelativeMuPower = calculateRelativePower(stftResult[i], muMin, muMax, N);
+                // Append to csv
+                outputFile << stftRelativeDeltaPower << "," << stftRelativeThetaPower << "," << stftRelativeAlphaPower << "," << stftRelativeBetaPower << "," << stftRelativeGammaPower << "," << stftRelativeMuPower << "\n";
+            }
+            outputFile.close();
+            std::cout << "STFT Analysis output written to stft_analysis.csv successfully" << std::endl;
+    }else{
+        std:cerr << "Failed to open stft_analysis.csv for writing." << std::endl;
+    }
+}
+
 int main() {
 
     // Initialize a vector to store eeg signal data
@@ -277,8 +339,8 @@ int main() {
     // Define the number of bins for discretization (for Shannon entropy)
     int numBins = 10; // This value can be adjusted as needed
     // Define some STFT parameters
-    int windowSize = 256; // This value can be adjusted as needed
-    int hopSize = 64; // This value can be adjusted as needed
+    int windowSize = 160; // This value specifies how much data you want to consider at a time.
+    int hopSize = 80; // This value indicates how much the analysis window shifts after each analysis. When less than the window size, there will be overlapping windows. This means that each analysis window shares some data with the previous window. Overlapping windows can help capture temporal or spatial information more effectively.
 
     // Calculate the mean
     double mean = computeMean(signalData);
@@ -326,6 +388,8 @@ int main() {
     std::cout << "Shannon Entropy: " << entropy << std::endl;
     std::cout << "Zero-Crossing Rate: " << zeroCrossingRate << std::endl;
     std::cout << "Hjorth parameters - Activity: " << params.activity << " - Mobility: " << params.mobility << " - Complexity: " << params.complexity << std::endl;
+    storeFFTWAnalysistoCSV(fftwResult, deltaMin, deltaMax, thetaMin, thetaMax, alphaMin, alphaMax, betaMin, betaMax, gammaMin, gammaMax, muMin, muMax);
+    storeSTFTAnalysistoCSV(stftResult, deltaMin, deltaMax, thetaMin, thetaMax, alphaMin, alphaMax, betaMin, betaMax, gammaMin, gammaMax, muMin, muMax);
 
     return 0;
     
