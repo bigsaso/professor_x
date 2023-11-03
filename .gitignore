@@ -3,9 +3,11 @@ CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
 Makefile
-# Ignoring any csv generated
+# Ignoring any csv and txt generated
 *.csv
+*.txt
 # Ignoring any .edf dataset used in Fall semester
 *.edf
 # Ignoring compiled code
 post_process
+process
