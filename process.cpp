@@ -329,10 +329,6 @@ Features analyze(const std::vector<double> buffer) {
 
     // Store in features struct
     features.numSamples = N;
-    // features.mean = mean;
-    // features.variance = variance;
-    // features.skewness = skewness;
-    // features.kurtosis = kurtosis;
     features.statisticalFeatures = statisticalFeatures;
     features.fftwRelativePowers = fftwRelativePowers;
     features.entropy = entropy;
@@ -344,11 +340,22 @@ Features analyze(const std::vector<double> buffer) {
     return features;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     // Initialize a vector to store eeg signal data
     std::vector<double> signalData;
-    // Read from pre-processed signal in .csv file
-    std::ifstream inputFile("preprocessed_signal.csv");
+    // Declare the ifstream outside of the if block
+    std::ifstream inputFile;
+    // Check if there are any command-line arguments
+    if (argc < 2) {
+        // Read from pre-processed signal in .csv file
+        inputFile.open("preprocessed_signal.csv");
+        std::cout << "Processing preprocessed_signal.csv" << std::endl;
+    }
+    else{
+        // Read from pre-processed signal in .csv file
+        inputFile.open(argv[1]);
+        std::cout << "Processing " << argv[1] << std::endl;
+    }
     // Store in the vector initialized earlier
     if (inputFile.is_open()) {
         double value;
