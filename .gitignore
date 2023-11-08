@@ -11,3 +11,4 @@ Makefile
 # Ignoring compiled code
 post_process
 process
+simulate_live_data
