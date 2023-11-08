@@ -374,6 +374,7 @@ int main(int argc, char* argv[]) {
     std::map<std::string, Features> analysisResults;
     // Initialize counter -- will be used to identify each bucket analyzed
     int counter = 1;
+    bool isFirstBuffer = true;
 
     string data;
     Features features;
@@ -381,7 +382,17 @@ int main(int argc, char* argv[]) {
         // You can process the data point here or simply ignore it
         buffer.push_back(stod(data));
         // Once buffer is full
-        if (buffer.size() == bufferSize) {
+        if (buffer.size() == bufferSize && isFirstBuffer) {
+            // Analyze it
+            features = analyze(buffer);
+            // Clear the buffer
+            buffer.clear();
+            // Increment the counter
+            ++counter;
+            // And disable isFirstBuffer
+            isFirstBuffer = false;
+        }
+        else if (buffer.size() == bufferSize && !isFirstBuffer) {
             // Analyze it
             features = analyze(buffer);
             // Store results in their respective bucket
@@ -429,52 +440,53 @@ int main(int argc, char* argv[]) {
         this_thread::sleep_for(chrono::microseconds(static_cast<int>(delayMilliseconds * 1000.0)));
     }
 
-    // If csv is done but buffer not full, analyze remaining data
-    if(buffer.size() != bufferSize && buffer.size() != 0){
-        std::cout << "Buffer not full but data done" << buffer.size() << std::endl;
-        // Analyze it
-        features = analyze(buffer);
-        // Store results in their respective bucket
-        std::cout << "buffer" << std::to_string(counter) << "_analyzed" << std::endl;
-        // Display results
-        // Output results
-        int frameNum = 1; // Initialize frame number
-        std::cout << "Samples in buffer = " << features.numSamples
-            << "\n\tMean = " << features.statisticalFeatures.mean
-            << "\n\tVariance = " << features.statisticalFeatures.variance
-            << "\n\tSkewness = " << features.statisticalFeatures.skewness
-            << "\n\tKurtosis = " << features.statisticalFeatures.kurtosis
-            << "\n\tRelative Delta Power = " << features.fftwRelativePowers.relativeDeltaPower
-            << "\n\tRelative Theta Power = " << features.fftwRelativePowers.relativeThetaPower
-            << "\n\tRelative Alpha Power = " << features.fftwRelativePowers.relativeAlphaPower
-            << "\n\tRelative Beta Power = " << features.fftwRelativePowers.relativeBetaPower
-            << "\n\tRelative Gamma Power = " << features.fftwRelativePowers.relativeGammaPower
-            << "\n\tRelative Mu Power = " << features.fftwRelativePowers.relativeMuPower
-            << "\n\tEntropy = " << features.entropy
-            << "\n\tZero Crossing Rate = " << features.zeroCrossingRate
-            << "\n\tHjorth Parameters:"
-            << "\n\t\tActivity = " << features.hjorthParams.activity
-            << "\n\t\tMobility = " << features.hjorthParams.mobility
-            << "\n\t\tComplexity = " << features.hjorthParams.complexity
-            // << std::endl;
-            << "\n\tSTFT Relative Powers: [";
-            for (const auto& stftRelativePowers : features.stftRelativePowers) {
-                std::cout << "\n\t\tFrame " << frameNum << "("
-                        << "Delta = " << stftRelativePowers.relativeDeltaPower
-                        << ", Theta = " << stftRelativePowers.relativeThetaPower
-                        << ", Alpha = " << stftRelativePowers.relativeAlphaPower
-                        << ", Beta = " << stftRelativePowers.relativeBetaPower
-                        << ", Gamma = " << stftRelativePowers.relativeGammaPower
-                        << ", Mu = " << stftRelativePowers.relativeMuPower
-                        << "),";
-                frameNum++; // Increment frame number
-            }
-            std::cout << "\n\t]" << std::endl;
-        // Then clear the buffer
-        buffer.clear();
-        // And increment the counter
-        ++counter;
-    }
+    // Commenting this out as even in final implementation, only once buffer is full it should be analyzed
+    // // If csv is done but buffer not full, analyze remaining data
+    // if(buffer.size() != bufferSize && buffer.size() != 0){
+    //     std::cout << "Buffer not full but data done" << buffer.size() << std::endl;
+    //     // Analyze it
+    //     features = analyze(buffer);
+    //     // Store results in their respective bucket
+    //     std::cout << "buffer" << std::to_string(counter) << "_analyzed" << std::endl;
+    //     // Display results
+    //     // Output results
+    //     int frameNum = 1; // Initialize frame number
+    //     std::cout << "Samples in buffer = " << features.numSamples
+    //         << "\n\tMean = " << features.statisticalFeatures.mean
+    //         << "\n\tVariance = " << features.statisticalFeatures.variance
+    //         << "\n\tSkewness = " << features.statisticalFeatures.skewness
+    //         << "\n\tKurtosis = " << features.statisticalFeatures.kurtosis
+    //         << "\n\tRelative Delta Power = " << features.fftwRelativePowers.relativeDeltaPower
+    //         << "\n\tRelative Theta Power = " << features.fftwRelativePowers.relativeThetaPower
+    //         << "\n\tRelative Alpha Power = " << features.fftwRelativePowers.relativeAlphaPower
+    //         << "\n\tRelative Beta Power = " << features.fftwRelativePowers.relativeBetaPower
+    //         << "\n\tRelative Gamma Power = " << features.fftwRelativePowers.relativeGammaPower
+    //         << "\n\tRelative Mu Power = " << features.fftwRelativePowers.relativeMuPower
+    //         << "\n\tEntropy = " << features.entropy
+    //         << "\n\tZero Crossing Rate = " << features.zeroCrossingRate
+    //         << "\n\tHjorth Parameters:"
+    //         << "\n\t\tActivity = " << features.hjorthParams.activity
+    //         << "\n\t\tMobility = " << features.hjorthParams.mobility
+    //         << "\n\t\tComplexity = " << features.hjorthParams.complexity
+    //         // << std::endl;
+    //         << "\n\tSTFT Relative Powers: [";
+    //         for (const auto& stftRelativePowers : features.stftRelativePowers) {
+    //             std::cout << "\n\t\tFrame " << frameNum << "("
+    //                     << "Delta = " << stftRelativePowers.relativeDeltaPower
+    //                     << ", Theta = " << stftRelativePowers.relativeThetaPower
+    //                     << ", Alpha = " << stftRelativePowers.relativeAlphaPower
+    //                     << ", Beta = " << stftRelativePowers.relativeBetaPower
+    //                     << ", Gamma = " << stftRelativePowers.relativeGammaPower
+    //                     << ", Mu = " << stftRelativePowers.relativeMuPower
+    //                     << "),";
+    //             frameNum++; // Increment frame number
+    //         }
+    //         std::cout << "\n\t]" << std::endl;
+    //     // Then clear the buffer
+    //     buffer.clear();
+    //     // And increment the counter
+    //     ++counter;
+    // }
 
     // Close the CSV file
     csvFile.close();
