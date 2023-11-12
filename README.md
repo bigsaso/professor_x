@@ -52,19 +52,25 @@ This README provides step-by-step instructions for setting up a Raspberry Pi and
 ### CMake
 
 1. Install essential build tools and libraries:
-$ sudo apt-get install build-essential libssl-dev
+```
+sudo apt-get install build-essential libssl-dev
+```
 
-2. Download and install CMake:<br />
-$ cd /tmp<br />
-$ wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0.tar.gz<br />
-$ tar -zxvf cmake-3.20.0.tar.gz<br />
-$ cd cmake-3.20.0<br />
-$ ./bootstrap<br />
-$ make (or gmake on RPi)<br />
-$ sudo make install
+2. Download and install CMake:
+```
+cd /tmp
+wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0.tar.gz
+tar -zxvf cmake-3.20.0.tar.gz
+cd cmake-3.20.0
+./bootstrap
+make (or gmake on RPi)
+sudo make install
+```
 
-3. Verify the installation:<br />
-$ cmake --version
+3. Verify the installation:
+```
+cmake --version
+```
 
 ---
 
@@ -72,24 +78,33 @@ $ cmake --version
 
 ### Download and install FFTW Library
 
-1. Download FFTW Library:<br />
-$ wget https://www.fftw.org/fftw-3.3.10.tar.gz<br />
-$ tar xf fftw-3.3.10.tar.gz<br />
-$ cd fftw-3.3.10
+1. Download FFTW Library:
+```
+wget https://www.fftw.org/fftw-3.3.10.tar.gz
+tar xf fftw-3.3.10.tar.gz
+cd fftw-3.3.10
+```
 
-2. Configure and install:<br />
-$ ./configure<br />
-$ make<br />
-$ sudo make install
+2. Configure and install:
+```
+./configure
+make
+sudo make install
+```
 
 ### Set-up to use in our C++ project
 
 1. Set the correct FFTW directory in the CMakeLists.txt file.<br />
-2. Compile your C++ source file:<br />
-$ cmake .<br />
-$ make
-3. Run the code<br />
-$ ./post_process
+2. Compile your C++ source file:
+```
+mkdir build && cd build
+cmake ..
+make
+```
+3. Run the code
+```
+./simulate_live_data <preprocessed CSV file>
+```
 
 ---
 

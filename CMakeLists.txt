@@ -12,7 +12,7 @@ add_executable(simulate_live_data simulate_live_data.cpp statistical_features.cp
 target_include_directories(simulate_live_data PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_include_directories(simulate_live_data PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# Specify the library directories
+# Specify the library directories -- Set this up properly
 link_directories(/home/pi/Download/fftw-3.3.10)
 
 # Link against the required libraries
