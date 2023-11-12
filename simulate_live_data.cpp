@@ -1,12 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <cmath>
-#include <string>
-#include <complex>
-#include <fftw3.h>
-#include <map>
-#include <algorithm>
 #include <chrono>
 #include <thread>
 
