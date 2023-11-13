@@ -3,13 +3,13 @@
 #include <numeric>
 #include <cmath>
 
-std::vector<std::complex<double>> computeBispectrum(const std::vector<std::complex<double>> signal, int N) {
+std::vector<std::complex<double>> computeBispectrum(const std::vector<std::complex<double>> fftw, int N) {
     std::vector<std::complex<double>> bispectrum(N * N);
 
     for (int f1 = 0; f1 < N; ++f1) {
         for (int f2 = 0; f2 < N; ++f2) {
             int f3 = (f1 + f2) % N;
-            bispectrum[f1 * N + f2] = signal[f1] * signal[f2] * std::conj(signal[f3]);
+            bispectrum[f1 * N + f2] = fftw[f1] * fftw[f2] * std::conj(fftw[f3]);
         }
     }
 

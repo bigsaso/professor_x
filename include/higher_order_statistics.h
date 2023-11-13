@@ -11,7 +11,7 @@ struct HigherOrderStatistics {
     double thirdMoment;
 };
 
-std::vector<std::complex<double>> computeBispectrum(const std::vector<std::complex<double>> signal, int N);
+std::vector<std::complex<double>> computeBispectrum(const std::vector<std::complex<double>> fftw, int N);
 double computeThirdMoment(const std::vector<double> signal, int N);
 HigherOrderStatistics computeHigherOrderStatistics(const std::vector<std::complex<double>> fftw, const std::vector<double> signal, int N, double deltaMin, double deltaMax, double thetaMin, double thetaMax, double alphaMin, double alphaMax, double betaMin, double betaMax, double gammaMin, double gammaMax, double muMin, double muMax);
 
