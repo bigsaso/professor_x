@@ -65,22 +65,27 @@ int main(int argc, char* argv[]) {
             // Display results
             int frameNum = 1; // Initialize frame number
             std::cout << "Samples in buffer = " << features.numSamples
-                << "\n\tMean = " << features.statisticalFeatures.mean
-                << "\n\tVariance = " << features.statisticalFeatures.variance
-                << "\n\tSkewness = " << features.statisticalFeatures.skewness
-                << "\n\tKurtosis = " << features.statisticalFeatures.kurtosis
-                << "\n\tRelative Delta Power = " << features.fftwRelativePowers.relativeDeltaPower
-                << "\n\tRelative Theta Power = " << features.fftwRelativePowers.relativeThetaPower
-                << "\n\tRelative Alpha Power = " << features.fftwRelativePowers.relativeAlphaPower
-                << "\n\tRelative Beta Power = " << features.fftwRelativePowers.relativeBetaPower
-                << "\n\tRelative Gamma Power = " << features.fftwRelativePowers.relativeGammaPower
-                << "\n\tRelative Mu Power = " << features.fftwRelativePowers.relativeMuPower
+                << "\n\tStatistical Features: ["
+                << "\n\t\tMean = " << features.statisticalFeatures.mean
+                << "\n\t\tVariance = " << features.statisticalFeatures.variance
+                << "\n\t\tSkewness = " << features.statisticalFeatures.skewness
+                << "\n\t\tKurtosis = " << features.statisticalFeatures.kurtosis
+                << "\n\t]"
+                << "\n\tFFTW Relative Powers: ["
+                << "\n\t\tRelative Delta Power = " << features.fftwRelativePowers.relativeDeltaPower
+                << "\n\t\tRelative Theta Power = " << features.fftwRelativePowers.relativeThetaPower
+                << "\n\t\tRelative Alpha Power = " << features.fftwRelativePowers.relativeAlphaPower
+                << "\n\t\tRelative Beta Power = " << features.fftwRelativePowers.relativeBetaPower
+                << "\n\t\tRelative Gamma Power = " << features.fftwRelativePowers.relativeGammaPower
+                << "\n\t\tRelative Mu Power = " << features.fftwRelativePowers.relativeMuPower
+                << "\n\t]"
                 << "\n\tEntropy = " << features.entropy
                 << "\n\tZero Crossing Rate = " << features.zeroCrossingRate
-                << "\n\tHjorth Parameters:"
+                << "\n\tHjorth Parameters: ["
                 << "\n\t\tActivity = " << features.hjorthParams.activity
                 << "\n\t\tMobility = " << features.hjorthParams.mobility
                 << "\n\t\tComplexity = " << features.hjorthParams.complexity
+                << "\n\t]"
                 << "\n\tSTFT Relative Powers: [";
                 for (const auto& stftRelativePowers : features.stftRelativePowers) {
                     std::cout << "\n\t\tFrame " << frameNum << "("
@@ -93,7 +98,7 @@ int main(int argc, char* argv[]) {
                             << "),";
                     frameNum++; // Increment frame number
                 }
-                std::cout << "\n\t]"// << std::endl;
+                std::cout << "\n\t]"
                 << "\n\tBispectrum Relative Powers: ["
                 << "\n\t\tRelative Delta Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeDeltaPower
                 << "\n\t\tRelative Theta Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeThetaPower
@@ -102,7 +107,8 @@ int main(int argc, char* argv[]) {
                 << "\n\t\tRelative Gamma Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeGammaPower
                 << "\n\t\tRelative Mu Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeMuPower
                 << "\n\t]"
-                << "\n\tThird Moment: " << features.higherOrderStatistics.thirdMoment << std::endl;
+                << "\n\tThird Moment: " << features.higherOrderStatistics.thirdMoment
+                << std::endl;
             // Then clear the buffer
             buffer.clear();
             // And increment the counter
