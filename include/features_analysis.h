@@ -10,6 +10,7 @@
 #include "zero_crossing_rate.h"
 #include "hjorth_parameters.h"
 #include "stft_relative_powers.h"
+#include "higher_order_statistics.h"
 
 // Struct for each buffer analysis features
 struct Features {
@@ -20,6 +21,7 @@ struct Features {
     int zeroCrossingRate;
     HjorthParameters hjorthParams;
     std::vector<RelativePowers> stftRelativePowers;
+    HigherOrderStatistics higherOrderStatistics;
 };
 
 // Declaration of analyze function

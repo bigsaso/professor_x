@@ -47,6 +47,8 @@ Features analyze(const std::vector<double> buffer) {
     HjorthParameters hjorthParams = calculateHjorthParameters(buffer, N);
     // Calculate STFT powers
     std::vector<RelativePowers> stftRelativePowers = calculateSTFTRelativePowers(buffer, windowSize, hopSize, N, deltaMin, deltaMax, thetaMin, thetaMax, alphaMin, alphaMax, betaMin, betaMax, gammaMin, gammaMax, muMin, muMax);
+    // Calculate Higher Order Statistics
+    HigherOrderStatistics higherOrderStatistics = computeHigherOrderStatistics(fftwResult, buffer, N, deltaMin, deltaMax, thetaMin, thetaMax, alphaMin, alphaMax, betaMin, betaMax, gammaMin, gammaMax, muMin, muMax);
 
     // Store in features struct
     features.numSamples = N;
@@ -56,6 +58,7 @@ Features analyze(const std::vector<double> buffer) {
     features.zeroCrossingRate = zeroCrossingRate;
     features.hjorthParams = hjorthParams;
     features.stftRelativePowers = stftRelativePowers;
+    features.higherOrderStatistics = higherOrderStatistics;
 
     // Return the resulting features
     return features;

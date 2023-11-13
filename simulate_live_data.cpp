@@ -63,7 +63,6 @@ int main(int argc, char* argv[]) {
             // Store results in their respective bucket
             std::cout << "buffer" << std::to_string(counter) << "_analyzed" << std::endl;
             // Display results
-            // Output results
             int frameNum = 1; // Initialize frame number
             std::cout << "Samples in buffer = " << features.numSamples
                 << "\n\tMean = " << features.statisticalFeatures.mean
@@ -82,7 +81,6 @@ int main(int argc, char* argv[]) {
                 << "\n\t\tActivity = " << features.hjorthParams.activity
                 << "\n\t\tMobility = " << features.hjorthParams.mobility
                 << "\n\t\tComplexity = " << features.hjorthParams.complexity
-                // << std::endl;
                 << "\n\tSTFT Relative Powers: [";
                 for (const auto& stftRelativePowers : features.stftRelativePowers) {
                     std::cout << "\n\t\tFrame " << frameNum << "("
@@ -95,7 +93,16 @@ int main(int argc, char* argv[]) {
                             << "),";
                     frameNum++; // Increment frame number
                 }
-                std::cout << "\n\t]" << std::endl;
+                std::cout << "\n\t]"// << std::endl;
+                << "\n\tBispectrum Relative Powers: ["
+                << "\n\t\tRelative Delta Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeDeltaPower
+                << "\n\t\tRelative Theta Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeThetaPower
+                << "\n\t\tRelative Alpha Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeAlphaPower
+                << "\n\t\tRelative Beta Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeBetaPower
+                << "\n\t\tRelative Gamma Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeGammaPower
+                << "\n\t\tRelative Mu Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeMuPower
+                << "\n\t]"
+                << "\n\tThird Moment: " << features.higherOrderStatistics.thirdMoment << std::endl;
             // Then clear the buffer
             buffer.clear();
             // And increment the counter
