@@ -3,7 +3,7 @@ function [preprocessed_signal,total_peaks] = clean_and_preprocess(edf, title_tex
     task = edfread(edf);
     task_fpz = vertcat(task.Fpz_{:});
     task_fpz = normalize(task_fpz);
-    Fs = 160; % Will become 100Hz once working with data coming from the actual headset.
+    Fs = 160; % Will become 512Hz once working with data coming from the actual headset.
     % Plot signal
     figure;
     plot(task_fpz, 'k');
@@ -17,7 +17,7 @@ function [preprocessed_signal,total_peaks] = clean_and_preprocess(edf, title_tex
     xlabel("time"); ylabel("mV");
     grid on;
     % Design low pass filter and filter signal
-    digFilt = designfilt('lowpassiir','PassbandFrequency',8,'StopbandFrequency',30,'PassbandRipple',1,'StopbandAttenuation',60,'SampleRate',500);
+    digFilt = designfilt('lowpassiir','PassbandFrequency',8,'StopbandFrequency',30,'PassbandRipple',1,'StopbandAttenuation',60,'SampleRate',Fs);
     task_fpz_filtered = filter(digFilt, task_fpz);
     % Plotting the delay of the lowpass filter
     grpdelay(digFilt,500,Fs)
