@@ -2,11 +2,11 @@
 #include "fftw_relative_powers.h"
 
 // Function to calculate relative power
-double calculateRelativePower(const std::vector<std::complex<double>> signal, double min, double max, int signalSize) {
+double calculateRelativePower(const std::vector<std::complex<double>> fftw, double min, double max, int signalSize) {
     // Calculate power spectrum (magnitude squared of FFT)
     std::vector<double> powerSpectrum(signalSize);
     for(int i=0;i<signalSize;i++){
-        powerSpectrum[i] = std::norm(signal[i]);
+        powerSpectrum[i] = std::norm(fftw[i]);
     }
     // Calculate the total power (sum of all frequencies)
     double totalPower = 0.0;
@@ -25,20 +25,20 @@ double calculateRelativePower(const std::vector<std::complex<double>> signal, do
 }
 
 // Function to calculate FFTW Relative Powers
-RelativePowers calculateRelativePowers(const std::vector<std::complex<double>> signal, int N, double deltaMin, double deltaMax, double thetaMin, double thetaMax, double alphaMin, double alphaMax, double betaMin, double betaMax, double gammaMin, double gammaMax, double muMin, double muMax) {
+RelativePowers calculateRelativePowers(const std::vector<std::complex<double>> fftw, int N, double deltaMin, double deltaMax, double thetaMin, double thetaMax, double alphaMin, double alphaMax, double betaMin, double betaMax, double gammaMin, double gammaMax, double muMin, double muMax) {
     RelativePowers relativePowers;
     // Calculate relative delta power
-    double relativeDeltaPower = calculateRelativePower(signal, deltaMin, deltaMax, N);
+    double relativeDeltaPower = calculateRelativePower(fftw, deltaMin, deltaMax, N);
     // Calculate relative theta power
-    double relativeThetaPower = calculateRelativePower(signal, thetaMin, thetaMax, N);
+    double relativeThetaPower = calculateRelativePower(fftw, thetaMin, thetaMax, N);
     // Calculate relative alpha power
-    double relativeAlphaPower = calculateRelativePower(signal, alphaMin, alphaMax, N);
+    double relativeAlphaPower = calculateRelativePower(fftw, alphaMin, alphaMax, N);
     // Calculate relative beta power
-    double relativeBetaPower = calculateRelativePower(signal, betaMin, betaMax, N);
+    double relativeBetaPower = calculateRelativePower(fftw, betaMin, betaMax, N);
     // Calculate relative gamma power
-    double relativeGammaPower = calculateRelativePower(signal, gammaMin, gammaMax, N);
+    double relativeGammaPower = calculateRelativePower(fftw, gammaMin, gammaMax, N);
     // Calculate relative mu power
-    double relativeMuPower = calculateRelativePower(signal, muMin, muMax, N);
+    double relativeMuPower = calculateRelativePower(fftw, muMin, muMax, N);
     relativePowers.relativeDeltaPower = relativeDeltaPower;
     relativePowers.relativeThetaPower = relativeThetaPower;
     relativePowers.relativeAlphaPower = relativeAlphaPower;

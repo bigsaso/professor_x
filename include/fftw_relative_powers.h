@@ -16,8 +16,8 @@ struct RelativePowers {
 };
 
 // Function declarations
-double calculateRelativePower(const std::vector<std::complex<double>> signal, double min, double max, int signalSize);
-RelativePowers calculateRelativePowers(const std::vector<std::complex<double>> signal, int N, 
+double calculateRelativePower(const std::vector<std::complex<double>> fftw, double min, double max, int signalSize);
+RelativePowers calculateRelativePowers(const std::vector<std::complex<double>> fftw, int N, 
                                        double deltaMin, double deltaMax, double thetaMin, double thetaMax, 
                                        double alphaMin, double alphaMax, double betaMin, double betaMax, 
                                        double gammaMin, double gammaMax, double muMin, double muMax);
