@@ -2,10 +2,34 @@
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
 
 #include "features_analysis.h"
 
+#define PORT 8080
+
 using namespace std;
+
+bool receiveData(int sockfd, struct sockaddr_in &client_addr, double* buffer, int bufferSize) {
+    socklen_t addr_len = sizeof(client_addr);
+    int expectedSize = bufferSize * sizeof(double); // Size in bytes
+
+    ssize_t recv_len = recvfrom(sockfd, (char*) buffer, expectedSize, 0, 
+                                (struct sockaddr *) &client_addr, &addr_len);
+
+    if (recv_len < 0) {
+        std::cerr << "recvfrom failed" << std::endl;
+        return false;
+    } else if (recv_len != expectedSize) {
+        std::cerr << "Received unexpected data size: " << recv_len << std::endl;
+        return false;
+    }
+
+    return true;
+}
 
 int main(int argc, char* argv[]) {
     
@@ -30,7 +54,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    double buffer[1024];
+    double raw_data[1024];
 
     // Calculate the time delay between each data point to achieve 512Hz
     double samplingRateHz = 512.0;
@@ -38,8 +62,8 @@ int main(int argc, char* argv[]) {
 
     // Define buffer size as 1024 (2s of sampling data at 512Hz)
     const int bufferSize = 1024;
-    // Initialize the buffer
-    std::vector<double> buffer;
+    // // Initialize the buffer
+    // std::vector<double> buffer;
     // Initialize a map of analysisResults
     std::map<std::string, Features> analysisResults;
     // Initialize counter -- will be used to identify each bucket analyzed
@@ -50,7 +74,9 @@ int main(int argc, char* argv[]) {
     while (true) {
         std::cout << "Waiting for data..." << std::endl;
 
-        if (receiveData(sockfd, client_addr, buffer, 1024)) {
+        if (receiveData(sockfd, client_addr, raw_data, 1024)) {
+            // Initialize the buffer
+            std::vector<double> buffer(raw_data, raw_data + 1024);
             if (buffer.size() == bufferSize && isFirstBuffer) {
                 // Analyze it
                 features = analyze(buffer);
