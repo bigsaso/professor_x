@@ -16,4 +16,4 @@ target_include_directories(simulate_udp_live_data PRIVATE ${CMAKE_CURRENT_SOURCE
 link_directories(/home/pi/Download/fftw-3.3.10)
 
 # Link against the required libraries
-target_link_libraries(simulate_live_data PRIVATE stdc++ m fftw3)
+target_link_libraries(simulate_udp_live_data PRIVATE stdc++ m fftw3)
