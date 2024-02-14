@@ -14,7 +14,8 @@ process
 simulate_live_data
 # Ignoring MacOS files
 .DS_Store
-# Ignoring MATLAB folders
+# Ignoring MATLAB folders and files
 database
 html
 mcode
+matlab.mat
