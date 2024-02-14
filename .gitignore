@@ -5,7 +5,6 @@ cmake_install.cmake
 Makefile
 # Ignoring any csv and txt generated
 *.csv
-*.txt
 # Ignoring any .edf dataset used in Fall semester
 *.edf
 # Ignoring compiled code
@@ -13,3 +12,5 @@ build
 post_process
 process
 simulate_live_data
+# Ignoring MacOS files
+.DS_Store
