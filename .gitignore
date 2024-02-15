@@ -19,3 +19,6 @@ database
 html
 mcode
 matlab.mat
+# Ignoring Python files
+.venv
+__pycache__
