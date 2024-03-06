@@ -27,4 +27,4 @@ link_directories(/home/pi/Download/fftw-3.3.10)
 link_directories(/usr/local/lib)
 
 # Link against the required libraries
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE stdc++ m fftw3 tensorflow-lite)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE stdc++ m fftw3 tensorflow-lite wiringPi)
