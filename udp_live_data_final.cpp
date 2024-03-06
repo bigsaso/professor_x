@@ -7,6 +7,8 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
+#include <wiringPi.h>
+
 #include <tensorflow/lite/interpreter.h>
 #include <tensorflow/lite/model.h>
 #include <tensorflow/lite/kernels/register.h>
@@ -92,6 +94,13 @@ int main(int argc, char* argv[]) {
     int counter = 1;
     bool isFirstBuffer = true;
 
+    // Initialize GPIO pins
+    wiringPiSetup();			// Setup the library
+    int oneHandPin = 0;
+    int twoHandsPin = 1
+    pinMode(oneHandPin, OUTPUT);		// Configure GPIO0 as an output
+    pinMode(twoHandsPin, OUTPUT);		// Configure GPIO1 as an output
+
     Features features;
     while (true) {
         std::cout << "Waiting for data..." << std::endl;
@@ -112,55 +121,6 @@ int main(int argc, char* argv[]) {
             else if (buffer.size() == bufferSize && !isFirstBuffer) {
                 // Analyze it
                 features = analyze(buffer);
-                // // Store results in their respective bucket
-                // std::cout << "buffer" << std::to_string(counter) << "_analyzed" << std::endl;
-                // // Display results
-                // int frameNum = 1; // Initialize frame number
-                // std::cout << "Samples in buffer = " << features.numSamples
-                //     << "\n\tStatistical Features: ["
-                //     << "\n\t\tMean = " << features.statisticalFeatures.mean
-                //     << "\n\t\tVariance = " << features.statisticalFeatures.variance
-                //     << "\n\t\tSkewness = " << features.statisticalFeatures.skewness
-                //     << "\n\t\tKurtosis = " << features.statisticalFeatures.kurtosis
-                //     << "\n\t]"
-                //     << "\n\tFFTW Relative Powers: ["
-                //     << "\n\t\tRelative Delta Power = " << features.fftwRelativePowers.relativeDeltaPower
-                //     << "\n\t\tRelative Theta Power = " << features.fftwRelativePowers.relativeThetaPower
-                //     << "\n\t\tRelative Alpha Power = " << features.fftwRelativePowers.relativeAlphaPower
-                //     << "\n\t\tRelative Beta Power = " << features.fftwRelativePowers.relativeBetaPower
-                //     << "\n\t\tRelative Gamma Power = " << features.fftwRelativePowers.relativeGammaPower
-                //     << "\n\t\tRelative Mu Power = " << features.fftwRelativePowers.relativeMuPower
-                //     << "\n\t]"
-                //     << "\n\tEntropy = " << features.entropy
-                //     << "\n\tZero Crossing Rate = " << features.zeroCrossingRate
-                //     << "\n\tHjorth Parameters: ["
-                //     << "\n\t\tActivity = " << features.hjorthParams.activity
-                //     << "\n\t\tMobility = " << features.hjorthParams.mobility
-                //     << "\n\t\tComplexity = " << features.hjorthParams.complexity
-                //     << "\n\t]"
-                //     << "\n\tSTFT Relative Powers: [";
-                //     for (const auto& stftRelativePowers : features.stftRelativePowers) {
-                //         std::cout << "\n\t\tFrame " << frameNum << "("
-                //                 << "Delta = " << stftRelativePowers.relativeDeltaPower
-                //                 << ", Theta = " << stftRelativePowers.relativeThetaPower
-                //                 << ", Alpha = " << stftRelativePowers.relativeAlphaPower
-                //                 << ", Beta = " << stftRelativePowers.relativeBetaPower
-                //                 << ", Gamma = " << stftRelativePowers.relativeGammaPower
-                //                 << ", Mu = " << stftRelativePowers.relativeMuPower
-                //                 << "),";
-                //         frameNum++; // Increment frame number
-                //     }
-                //     std::cout << "\n\t]"
-                //     << "\n\tBispectrum Relative Powers: ["
-                //     << "\n\t\tRelative Delta Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeDeltaPower
-                //     << "\n\t\tRelative Theta Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeThetaPower
-                //     << "\n\t\tRelative Alpha Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeAlphaPower
-                //     << "\n\t\tRelative Beta Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeBetaPower
-                //     << "\n\t\tRelative Gamma Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeGammaPower
-                //     << "\n\t\tRelative Mu Power = " << features.higherOrderStatistics.bispectrumRelativePowers.relativeMuPower
-                //     << "\n\t]"
-                //     << "\n\tThird Moment: " << features.higherOrderStatistics.thirdMoment
-                //     << std::endl;
 
                 // Initiate the feature vector
                 std::vector<float> feature_vector;
@@ -198,6 +158,15 @@ int main(int argc, char* argv[]) {
 
                 std::cout << "Probability of One Hand: " << prob_onehand << std::endl;
                 std::cout << "Probability of Two Hands: " << prob_twohands << std::endl;
+
+                if(prob_onehand > prob_twohands){
+                    digitalWrite(oneHandPin, 1);
+                    digitalWrite(twoHandsPin, 0);
+                }
+                else if(prob_twohands > prob_onehand){
+                    digitalWrite(oneHandPin, 0);
+                    digitalWrite(twoHandsPin, 1);
+                }
 
                 // Then clear the buffer
                 buffer.clear();
