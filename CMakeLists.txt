@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 # Add a variable for the executable name
-set(EXECUTABLE_NAME "simulate_udp_live_data" CACHE STRING "Name of the executable")
+set(EXECUTABLE_NAME "udp_live_data_final" CACHE STRING "Name of the executable")
 
 # Add the source file(s) to your project
 add_executable(${EXECUTABLE_NAME} ${EXECUTABLE_NAME}.cpp statistical_features.cpp fftw.cpp fftw_relative_powers.cpp shannon_entropy.cpp zero_crossing_rate.cpp hjorth_parameters.cpp stft_relative_powers.cpp higher_order_statistics.cpp features_analysis.cpp)
