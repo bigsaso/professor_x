@@ -8,7 +8,7 @@ Makefile
 # Ignoring any .edf dataset used in Fall semester
 *.edf
 # Ignoring compiled code
-build
+*build
 post_process
 process
 simulate_live_data
