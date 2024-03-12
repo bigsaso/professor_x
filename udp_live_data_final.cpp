@@ -96,10 +96,14 @@ int main(int argc, char* argv[]) {
 
     // Initialize GPIO pins
     wiringPiSetup();			// Setup the library
-    int oneHandPin = 0;
-    int twoHandsPin = 1
-    pinMode(oneHandPin, OUTPUT);		// Configure GPIO0 as an output
-    pinMode(twoHandsPin, OUTPUT);		// Configure GPIO1 as an output
+    int forwardPin = 0;
+    int backwardPin = 1;
+    int leftPin = 2;
+    int rightPin = 3;
+    pinMode(forwardPin, OUTPUT);		// Configure GPIO0 as an output
+    pinMode(backwardPin, OUTPUT);		// Configure GPIO1 as an output
+    pinMode(leftPin, OUTPUT);		// Configure GPIO2 as an output
+    pinMode(rightPin, OUTPUT);		// Configure GPIO3 as an output
 
     Features features;
     while (true) {
@@ -152,20 +156,40 @@ int main(int argc, char* argv[]) {
 
                 // Use the output
                 float* output_data = output_tensor->data.f;
-                // Assuming your model outputs probabilities for two classes
-                float prob_onehand = output_data[0];
-                float prob_twohands = output_data[1];
+                // Model outputs 4 probabilities
+                float prob_forward = output_data[0];
+                float prob_backward = output_data[1];
+                float prob_left = output_data[2];
+                float prob_right = output_data[3];
 
-                std::cout << "Probability of One Hand: " << prob_onehand << std::endl;
-                std::cout << "Probability of Two Hands: " << prob_twohands << std::endl;
+                std::cout << "Probability of going Forward: " << prob_forward << std::endl;
+                std::cout << "Probability of going Backward: " << prob_backward << std::endl;
+                std::cout << "Probability of going Left: " << prob_left << std::endl;
+                std::cout << "Probability of going Right: " << prob_right << std::endl;
 
-                if(prob_onehand > prob_twohands){
-                    digitalWrite(oneHandPin, 1);
-                    digitalWrite(twoHandsPin, 0);
+                if(prob_forward > 0.85){
+                    digitalWrite(forwardPin, 1);
+                    digitalWrite(backwardPin, 0);
+                    digitalWrite(leftPin, 0);
+                    digitalWrite(rightPin, 0);
                 }
-                else if(prob_twohands > prob_onehand){
-                    digitalWrite(oneHandPin, 0);
-                    digitalWrite(twoHandsPin, 1);
+                else if(prob_backward > 0.85){
+                    digitalWrite(forwardPin, 0);
+                    digitalWrite(backwardPin, 1);
+                    digitalWrite(leftPin, 0);
+                    digitalWrite(rightPin, 0);
+                }
+                else if(prob_left > 0.85){
+                    digitalWrite(forwardPin, 0);
+                    digitalWrite(backwardPin, 0);
+                    digitalWrite(leftPin, 1);
+                    digitalWrite(rightPin, 0);
+                }
+                else if(prob_right > 0.85){
+                    digitalWrite(forwardPin, 0);
+                    digitalWrite(backwardPin, 0);
+                    digitalWrite(leftPin, 0);
+                    digitalWrite(rightPin, 1);
                 }
 
                 // Then clear the buffer
