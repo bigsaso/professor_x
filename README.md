@@ -98,12 +98,12 @@ sudo make install
 2. Compile your C++ source file:
 ```
 mkdir build && cd build
-cmake -DEXECUTABLE_NAME=simulate_live_data .. OR cmake -DEXECUTABLE_NAME=simulate_udp_live_data
+cmake -DEXECUTABLE_NAME=udp_live_data_final .. OR cmake -DEXECUTABLE_NAME=udp_live_data_final
 make
 ```
 3. Run the code
 ```
-./simulate_live_data <preprocessed CSV file>
+./udp_live_data_final
 ```
 
 ---
