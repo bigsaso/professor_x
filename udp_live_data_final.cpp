@@ -39,6 +39,14 @@ bool receiveData(int sockfd, struct sockaddr_in &client_addr, double* buffer, in
     return true;
 }
 
+void standardizeFeatures(std::vector<float>& features, 
+                         const std::vector<float>& means, 
+                         const std::vector<float>& stdDevs) {
+    for (size_t i = 0; i < features.size(); ++i) {
+        features[i] = (features[i] - means[i]) / stdDevs[i];
+    }
+}
+
 int main(int argc, char* argv[]) {
     
     // Initialize UDP connection
@@ -144,6 +152,47 @@ int main(int argc, char* argv[]) {
                 feature_vector.push_back(features.higherOrderStatistics.bispectrumRelativePowers.relativeBetaPower);
                 feature_vector.push_back(features.higherOrderStatistics.bispectrumRelativePowers.relativeGammaPower);
                 feature_vector.push_back(features.higherOrderStatistics.thirdMoment);
+
+                // Means imported from trained model
+                std::vector<float> feature_means = {
+                    0.008766941128661169,
+                    -0.5163828963053286,
+                    18.789033940372978,
+                    0.0033610710025781297,
+                    0.008430050297967282,
+                    0.23371823861148722,
+                    0.26764958117377546,
+                    0.005923435315469626,
+                    1.6774030595225673,
+                    813.7751673828361,
+                    0.0024626561302796726,
+                    0.005634546851066067,
+                    0.2785159317877636,
+                    0.22742071460022975,
+                    -567742.9624711577
+                };
+
+                // Std Deviations imported from trained model
+                std::vector<float> feature_std_devs = {
+                    0.9881721809825954,
+                    2.1847848489774786,
+                    20.96172885650971,
+                    0.013137574838904558,
+                    0.020360254299991994,
+                    0.0844387963098916,
+                    0.094688416889555,
+                    0.01647607558470322,
+                    0.8712593693717688,
+                    1413.2070778075251,
+                    0.012542240365146643,
+                    0.025527120812980416,
+                    0.12871067849253046,
+                    0.13776269630725865,
+                    4107060.5629486465
+                };
+
+                // Standardize the feature vector
+                standardizeFeatures(feature_vector, feature_means, feature_std_devs);
 
                 // Fill the input tensor with your features
                 float* input_data = input_tensor->data.f;
