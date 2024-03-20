@@ -246,8 +246,8 @@ int main(int argc, char* argv[]) {
                 // And increment the counter
                 ++counter;
             }
-            // Add a delay to simulate live data at 512Hz
-            this_thread::sleep_for(chrono::microseconds(static_cast<int>(delayMilliseconds * 1000.0)));
+            // // Add a delay to simulate live data at 512Hz -- Removed for live data deployment
+            // this_thread::sleep_for(chrono::microseconds(static_cast<int>(delayMilliseconds * 1000.0)));
         }
     }
 
