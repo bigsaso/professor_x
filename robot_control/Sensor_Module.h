@@ -2,51 +2,45 @@
 // ---------------------------------------------------------
 //                      INPUT PINS
 // ---------------------------------------------------------
-// ---- Flame Tracking ---- // new
-  #define F_Flame_IRSensor 32
-  #define R_Flame_IRSensor 30
-  #define L_Flame_IRSensor 28
 
 // ---- Edge Avoidance ----
 
-  #define BRTriggerPIN 52
-  #define BREchoPIN 50
+#define BLTriggerPIN 52
+#define BLEchoPIN 50
 
-  #define BLTriggerPIN 46
-  #define BLEchoPIN 48
+#define BRTriggerPIN 46
+#define BREchoPIN 48
 
-  #define FLTriggerPIN 42
-  #define FLEchoPIN 44
+#define FLTriggerPIN 42
+#define FLEchoPIN 44
 
-  #define FRTriggerPIN 40
-  #define FREchoPIN 38
+#define FRTriggerPIN 40
+#define FREchoPIN 38
 
 // ---- Object Avoidance ----
 
-  // Front Sharp IR
-  #define Sharp_IRSensor A5
+// Front Sharp IR
+#define Sharp_IRSensor A5
 
 
-  //Front IR sensors
-  #define FR_IRSensor 34
-  #define FL_IRSensor 36
-  
-  //Rear UltraSonic Sensor
-  #define BackTriggerPIN 13
-  #define BackEchoPIN 12
+//Front IR sensors
+#define FR_IRSensor 36
+#define FL_IRSensor 34
+
+//Rear UltraSonic Sensor
+#define BackTriggerPIN 13
+#define BackEchoPIN 12
 
 // ---- Line Tracking ----
-  // Front Bottom IR sensors
-  #define MiddleLinePin A1
-  #define LeftLinePin A2
-  #define RightLinePin A0 
+// Front Bottom IR sensors
+#define MiddleLinePin A1
+#define LeftLinePin A2
+#define RightLinePin A0 
 
 
-SharpIR Sharp_Front(Sharp_IRSensor,1080);
+SharpIR Sharp_Front(Sharp_IRSensor,1080);//new
 
 // -----------------------------
-// Flame IR Sensor // new
-uint8_t F_Flame_IR; L_Flame_IR; R_Flame_IR;
 
 // Edge Avoidance 
 float Edge_U_FL, Edge_U_FR, Edge_U_BL, Edge_U_BR;
@@ -78,29 +72,22 @@ namespace SensorFun{
     pinMode(BREchoPIN,    INPUT);
 
     // ------------- Object Avoidance --------------
-    pinMode(Sharp_IRSensor, INPUT);
-    pinMode(FL_IRSensor, INPUT); 
-    pinMode(FR_IRSensor, INPUT);
+    // pinMode(Obj_Sharp_Front, INPUT);
+    // pinMode(Obj_IR_FL, INPUT);   pinMode(Obj_IR_FR, INPUT);
     // pinMode(Obj_U_Back, INPUT);
     pinMode(BackTriggerPIN, OUTPUT);    
     pinMode(BackEchoPIN,    INPUT);
     // ------------- Line Tracking --------------
-    pinMode(LeftLinePin, INPUT);
-    pinMode(MiddleLinePin, INPUT);
-    pinMode(RightLinePin, INPUT);
-
-    // ------------- Flame Detection -------------
-    pinMode(F_Flame_IRSensor, INPUT);
-    pinMode(L_Flame_IRSensor, INPUT);
-    pinMode(R_Flame_IRSensor, INPUT);
+    // pinMode(Line_IR_Left, INPUT);
+    // pinMode(Line_IR_Middle, INPUT);
+    // pinMode(Line_IR_Right, INPUT);
   }
 
-  inline void Print(bool EdgeAvoidance = true, bool ObjectAvoidance = true, bool LineTracking = true, bool FlameTracking = true) {
+  inline void Print(bool EdgeAvoidance = true, bool ObjectAvoidance = true, bool LineTracking = true) {
     // Print the distance to the serial monitor
 
     // Serial.println("------------------------------");
     // Serial.println("------------------------------");
-
     if(EdgeAvoidance){
       Serial.print("Edge Avoidance: ");
       Serial.print("[Ultra Sonic] FL: ");   Serial.print(Edge_U_FL);   Serial.print("cm | ");  Serial.print("FR: ");  Serial.print(Edge_U_FR);   Serial.print("cm | ");
@@ -117,11 +104,6 @@ namespace SensorFun{
     if (LineTracking) {
       Serial.println("Line Tracking: ");
       Serial.print("[IR Sensor]Left: ");   Serial.print(Line_IR_Left);   Serial.print(" | "); Serial.print("Middle: ");   Serial.print(Line_IR_Middle);   Serial.print(" | ");  Serial.print("Right: ");  Serial.print(Line_IR_Right);   Serial.println("");
-    }
-    
-    if(FlameTracking) { // new
-      Serial.print("Flame Tracking:");
-      Serial.print("[Flame IR:]"); Serial.print(F_Flame_IR); Serial.print("cm"); Serial.print(" | "); Serial.print(L_Flame_IR); Serial.print("cm"); Serial.print(" | "); Serial.print(R_Flame_IR); Serial.print("cm");
     }
     Serial.println("");
 
@@ -178,17 +160,39 @@ namespace SensorFun{
     Line_IR_Middle = digitalRead(MiddleLinePin);
     Line_IR_Right = digitalRead(RightLinePin);
   }
-  inline void Read_Flame_Sensors(){ // new
-    F_Flame_IR = digitalRead(F_Flame_IRSensor);
-    R_Flame_IR = digitalRead(R_Flame_IRSensor);
-    L_Flame_IR = digitalRead(L_Flame_IRSensor);
-  }
+
 
   inline void Read_All_Sensors(){
     Read_EdgeAvoidance_FrontSensors();
     Read_EdgeAvoidance_BackSensors();
     Read_ObjectAvoidance_Sensors();
     Read_LineTracking_Sensors();
-    Read_Flame_Sensors(); // new
+  }
+
+  // Functions to print objects and/or edges
+  inline void PrintObjectDetection() {
+    if (Obj_Sharp_Front < 18 && Obj_IR_FL != 0 && Obj_IR_FR != 0) Serial.println("Object detected in front sharp");
+    if (Obj_Sharp_Front >= 18 && Obj_IR_FL == 0 && Obj_IR_FR != 0) Serial.println("Object detected in front IR left");
+    if (Obj_Sharp_Front >= 18 && Obj_IR_FL != 0 && Obj_IR_FR == 0) Serial.println("Object detected in front IR right");
+    if (Obj_Sharp_Front < 18 && Obj_IR_FL == 0 && Obj_IR_FR == 0) Serial.println("Object detected in front");
+    if (Obj_Sharp_Front < 18 && Obj_IR_FL == 0 && Obj_IR_FR != 0) Serial.println("Object detected in front left");
+    if (Obj_Sharp_Front < 18 && Obj_IR_FL != 0  && Obj_IR_FR == 0) Serial.println("Object detected in front right");
+    if (Obj_U_Back < 14) Serial.println("Object detected in back");
+  }
+
+  inline bool CheckSensorVal(float DistanceVal) {
+    if ((DistanceVal > 10) || (DistanceVal <= 3)) {
+      return true;
+    }
+    return false;
+  }
+
+  inline void PrintEdgeDetection() {
+    if (CheckSensorVal(Edge_U_FL) && !CheckSensorVal(Edge_U_FR)) Serial.println("Edge detected in front left");
+    if (!CheckSensorVal(Edge_U_FL) && CheckSensorVal(Edge_U_FR)) Serial.println("Edge detected in front right");
+    if (CheckSensorVal(Edge_U_BL) && !CheckSensorVal(Edge_U_BR)) Serial.println("Edge detected in back left");
+    if (!CheckSensorVal(Edge_U_BL) && CheckSensorVal(Edge_U_BR)) Serial.println("Edge detected in back right");
+    if (CheckSensorVal(Edge_U_FL) && CheckSensorVal(Edge_U_FR)) Serial.println("Edge detected in front");
+    if (CheckSensorVal(Edge_U_BL) && CheckSensorVal(Edge_U_BR)) Serial.println("Edge detected in back");
   }
 }
