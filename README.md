@@ -3,10 +3,10 @@
 This README provides step-by-step instructions for setting up a Raspberry Pi and configuring the C++ project for the eeg wheelchair.
 
 This repository contains:
-- The MATLAB code for signal acquisition and pre-processing;
-- The C++ code for signal processing, feature extraction, and classification;
-- The Python code used for training the model, achieving an accuracy of 93%;
-- The robot control source code can be found [here](https://github.com/AnnazG/capstone-robot-fall)
+- The MATLAB code for signal acquisition and pre-processing - by Alexander Zwegers;
+- The C++ code for signal processing, feature extraction, and classification - by Salvatore Logozzo;
+- The Python code used for training the model, achieving an accuracy of 93% - by Ibrahim Butt;
+- The Arduino code for controlling the robot - By Annas Ghani.
 
 ## Table of Contents
 
