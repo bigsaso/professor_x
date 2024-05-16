@@ -1,12 +1,14 @@
-# Raspberry Pi Setup and C++ Project Configuration
-
-This README provides step-by-step instructions for setting up a Raspberry Pi and configuring the C++ project for the eeg wheelchair.
+# Electroencephalographic Control of a Weelchair (Capstone Project)
 
 This repository contains:
 - The MATLAB code for signal acquisition and pre-processing - by Alexander Zwegers;
 - The C++ code for signal processing, feature extraction, and classification - by Salvatore Logozzo;
 - The Python code used for training the model, achieving an accuracy of 93% - by Ibrahim Butt;
 - The Arduino code for controlling the robot - By Annas Ghani ([@AnnazG](https://www.github.com/AnnazG)).
+
+# Raspberry Pi Setup and C++ Project Configuration
+
+This README provides step-by-step instructions for setting up a Raspberry Pi and configuring the C++ project for the eeg wheelchair.
 
 ## Table of Contents
 
