@@ -10,6 +10,12 @@
 #define DirRight 7
 #define DirLeft 8
 
+// GPIO pins connected to Raspberry Pi for control
+#define RightGPIO 24
+#define LeftGPIO 26
+#define BackwardGPIO 28
+#define ForwardGPIO 30
+
 // ---------------------------------------------------------
 //                      Helper Structs
 // ---------------------------------------------------------
@@ -41,6 +47,12 @@ namespace MovementFun {
     pinMode(DirLeft, OUTPUT);
 
     pinMode(MovementEnable, OUTPUT);
+       // Initialize GPIO pins for receiving signals from Raspberry Pi
+    pinMode(RightGPIO, INPUT);
+    pinMode(LeftGPIO, INPUT);
+    pinMode(BackwardGPIO, INPUT);
+    pinMode(ForwardGPIO, INPUT);
+  
   }
 
 
@@ -127,4 +139,22 @@ namespace MovementFun {
     direction = MovementDir::stop;
     digitalWrite(MovementEnable, LOW);
   }
+
+    // Function to check GPIO inputs and control movement accordingly
+  inline void CheckMovement() {
+    if (digitalRead(RightGPIO) == HIGH) {
+      TurnRight45();
+      Serial.println("Turning right");
+    } else if (digitalRead(LeftGPIO) == HIGH) {
+      TurnLeft45();
+      Serial.println("Turning left");
+    } else if (digitalRead(BackwardGPIO) == HIGH) {
+      Backward();
+      Serial.println("Moving Back");
+    } else if (digitalRead(ForwardGPIO) == HIGH) {
+      Forward();
+      Serial.println("Moving Forward");
+    } 
+  }
+
 }
