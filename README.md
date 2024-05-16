@@ -2,7 +2,7 @@
 
 This repository contains:
 - The MATLAB code for signal acquisition and pre-processing - by Alexander Zwegers;
-- The C++ code for signal processing, feature extraction, and classification - by Salvatore Logozzo;
+- The C++ code for signal processing, feature extraction, and classification - by Salvatore Logozzo ([@bigsaso](https://www.github.com/bigsaso));
 - The Python code used for training the model, achieving an accuracy of 93% - by Ibrahim Butt;
 - The Arduino code for controlling the robot - By Annas Ghani ([@AnnazG](https://www.github.com/AnnazG)).
 
