@@ -4,8 +4,7 @@
     2. front left and front right sensor not detecting at the same time
 */
 
-
-
+#include <FastLED.h>
 #include <SharpIR.h>
 #include <string.h>
 
@@ -15,6 +14,13 @@
 
 // ---- Movement ----
 #include "Movement_Module.h"
+
+// ---- LEDs ----
+#define LED_PIN 4  // Pin connected to the LED
+#define NUM_LEDS 1 // Number of LEDs
+#define BRIGHTNESS 20 // Initial brightness (adjust as needed)
+
+CRGB leds[NUM_LEDS]; // Define an array to store the LED colors
 
 // ---------------------------------------------------------
 //                      INPUT PINS
@@ -38,72 +44,11 @@ unsigned short int straightLineTracker = 0;
 
 long int TurnBackTime = 3000.0;
 
+bool lastButtonState = LOW;
+
 // ---------------------------------------------------------
 //                      Helper Functions
 // ---------------------------------------------------------
-
-
-enum ProtocolTypes {
-  EdgeAvoidance,
-  ObjectAvoidance,
-  LineTracking
-};
-
-class ProtocolInterface {
-public:
-  ProtocolInterface(ProtocolTypes Protocol) {
-    m_numOfOutputs = 0;
-    madeAnyDecisions = false;
-  }
-  int Log() {
-    m_numOfOutputs++;
-  }
-private:
-  int m_numOfOutputs;
-
-  bool madeAnyDecisions;
-};
-
-class Timer {
-public:
-  Timer() {
-    m_valueSet = false;
-  }
-
-  void m_Start() {
-    if (!m_valueSet) {
-      m_startTime = millis();
-      m_valueSet = true;
-    }
-  }
-
-  void m_ResetSetting() {
-    // m_startTime = ;
-    m_valueSet = false;
-  }
-
-  bool m_TimerDone(unsigned long timeLimit) {
-    unsigned long currentTime = millis();
-
-    if (((currentTime - m_startTime) > timeLimit) && (m_valueSet)) {
-      return true;
-    }
-    return false;
-  }
-
-  void m_Print(bool endLine = true) {
-    unsigned long currentTime = millis();
-    if (endLine) Serial.println(currentTime - m_startTime);
-    else Serial.print(currentTime - m_startTime);
-  }
-
-  bool m_AlreadyStarted(){
-    return m_valueSet;
-  }
-private:
-  bool m_valueSet;
-  unsigned long m_startTime;
-};
 
 inline bool CheckSensorVal(float DistanceVal) {
   if ((DistanceVal > MaxHeight) || (DistanceVal <= MinHeight)) {
@@ -112,264 +57,36 @@ inline bool CheckSensorVal(float DistanceVal) {
   return false;
 }
 
-Timer backwardTimer;
-
 inline bool EdgeAvoidanceLogic() {
-  bool madeAnyDecisions = false;
-  
-  // if all wheels are off the floor then stop
-  // if (CheckSensorVal(Edge_U_FL) && CheckSensorVal(Edge_U_FR) && CheckSensorVal(Edge_U_BL) && CheckSensorVal(Edge_U_BR)) {
-  //   Serial.println("------------ ALL SENSORS HIT ------------ ");
-  //   MovementFun::Stop();
-  // }
-  // else
-
-  if (direction != MovementDir::backward) {
-    backwardTimer.m_ResetSetting();
-   // SensorFun::Read_EdgeAvoidance_FrontSensors(); // new
-    if (CheckSensorVal(Edge_U_FL) && CheckSensorVal(Edge_U_FR)) {
-      Serial.println("------------ BOTH FORWARD SENSORS HIT ------------ ");
-      MovementFun::Backward();
-      straightLineTracker++;
-      madeAnyDecisions = true;
-    } else if (CheckSensorVal(Edge_U_FL)) {
-      Serial.println("------------ FORWARD LEFT SENSOR HIT ------------ ");
-      MovementFun::TurnRight45();
-      straightLineTracker = 0;
-      MovementFun::Forward();
-      madeAnyDecisions = true;
-
-    } else if (CheckSensorVal(Edge_U_FR)) {
-      Serial.println("------------ FORWARD RIGHT SENSOR HIT ------------ ");
-      MovementFun::TurnLeft45();
-      straightLineTracker = 0;
-      MovementFun::Forward();
-      madeAnyDecisions = true;
-    }
-  } else if ((direction != MovementDir::forward)) {
-   // SensorFun::Read_EdgeAvoidance_BackSensors(); // new
-
-    // used to prevent the robot from going backward, when backware sensor is weaker
-    // backwardTimer.m_Start();
-    // if (!backwardTimer.m_TimerDone(TurnBackTime)) {
-    //   // MovementFun::TurnLeft();
-    //   MovementFun::TurnLeft45();
-    //   MovementFun::TurnLeft45();
-    //   MovementFun::TurnLeft45();
-    //   MovementFun::Forward();
-    //   backwardTimer.m_ResetSetting();
-    // }
-
-    if (CheckSensorVal(Edge_U_BL) && CheckSensorVal(Edge_U_BR)) {
-      Serial.println("------------ BOTH BACKWARD SENSORS HIT ------------ ");
-      MovementFun::Forward();
-      straightLineTracker++;
-      madeAnyDecisions = true;
-
-      // if the machine has been moving back and forth in a straight line for 2 time (4 sensor hits)
-      // Turn to right to make the robot explore the ground
-      if (straightLineTracker >= 4) {
-        Serial.println("------------ STOPPING ROBOT FROM MOVING IN STRAIGHT LINE (TURNING RIGHT) ------------ ");
-        MovementFun::TurnLeft45();
-        straightLineTracker = 0;
-      }
-    } else if (CheckSensorVal(Edge_U_BL)) {
-      Serial.println("------------ BACKWARD LEFT SENSOR HIT ------------ ");
-      MovementFun::TurnRight45();
-      straightLineTracker = 0;
-      MovementFun::Forward();
-      madeAnyDecisions = true;
-
-    } else if (CheckSensorVal(Edge_U_BR)) {
-      Serial.println("------------ BACKWARD RIGHT SENSOR HIT ------------ ");
-      MovementFun::TurnLeft45();
-      straightLineTracker = 0;
-      MovementFun::Forward();
-      madeAnyDecisions = true;
-    }
+  // Read edge avoidance sensors
+  SensorFun::Read_EdgeAvoidance_FrontSensors();
+  SensorFun::Read_EdgeAvoidance_BackSensors();
+  // Check if any edge is detected
+  if (CheckSensorVal(Edge_U_FL) || CheckSensorVal(Edge_U_FR) || CheckSensorVal(Edge_U_BL) || CheckSensorVal(Edge_U_BR)) {
+    // Edge detected, stop movement
+    return true;
   }
-  return madeAnyDecisions;
-}
-// ------- new -------//
-// inline bool FlameTrackingLogic(){ // new
-//   bool madeAnyDecisions = false;
-//   SensorFun::Read_Flame_Sensors();
-//   if (F_Flame_IR >= 21){
-//     Serial.print("Flame Detected");
-//     MovementFun::Forward();
-//     madeAnyDecisions = true;
-//     if (F_Flame_IR <= 7){
-//      MovementFun::Stop();
-//    }
-//     if (F_Flame_IR == 0){
-//       Serial.print("Flame NOT Detected");
-//       MovementFun::Forward();
-//     }
-//   }
-//   return madeAnyDecisions;
-// }
-
-bool closeEnough = false;
-inline bool FlameTrackingLogic(){ // new
-  bool madeAnyDecisions = false;
-  SensorFun::Read_Flame_Sensors();
-  if (!closeEnough){
-    if (F_Flame_IR == 0){
-      Serial.print("Flame Detected");
-      MovementFun::Forward();
-      madeAnyDecisions = true;
-      SensorFun::Read_ObjectAvoidance_Sensors();
-      if(Obj_Sharp_Front < 7){
-        MovementFun::Stop();
-      } else {
-        MovementFun::Forward();
-      }
-            // Check for R_Flame_IR and turn right45
-      if (R_Flame_IR == 0) {
-        Serial.print("Flame Detected on Right");
-        MovementFun::TurnRight45();
-      }
-
-      // Check for L_Flame_IR and turn left45
-      if (L_Flame_IR == 0) {
-        Serial.print("Flame Detected on Left");
-        MovementFun::TurnLeft45();
-      }
-    //   if (F_Flame_IR == 1){
-    //    closeEnough = true;
-    //    MovementFun::Stop();
-    //  }
-    } return madeAnyDecisions;
-  }
-  // if (closeEnough){
-  //   // I need to used the timer class here to run the fan, but for now its enough.
-  //   Serial.print("Turning off flame");
-  //   MovementFun::TurnRight45();
-  //   MovementFun::TurnLeft45();
-  //   closeEnough = false; 
-  //   madeAnyDecisions = true;
-  // }
-  // return madeAnyDecisions;
-}
-
+  // No edge detected, continue movement
+  return false;
+} 
 
 inline bool ObjectAvoidanceLogic() {
-  bool madeAnyDecisions = false;
-  //SensorFun::Read_ObjectAvoidance_Sensors(); // new
-
-  if (Obj_Sharp_Front < 18) {
-    Serial.print("Front Sharp: ");
-  
-    madeAnyDecisions = true;
-    if ((Obj_IR_FL == 0) && (Obj_IR_FR == 0)) {
-      Serial.print("both");
-      MovementFun::Backward();
-    }
-    if (Obj_IR_FL == 1) {
-      Serial.print("Turn Left");
-      MovementFun::TurnLeft45();
-      MovementFun::Forward();
-    } 
-    else if (Obj_IR_FR == 1) {
-      Serial.print("Turn Right");
-      MovementFun::TurnRight45();
-      MovementFun::Forward();
-    }
-  }
-  else if (Obj_IR_FL == 0) {
-    Serial.print("Corner Sensor: Turn Right");
-    madeAnyDecisions = true;
-    MovementFun::TurnRight45();
-    MovementFun::Forward();
-  }
-  else if (Obj_IR_FR == 0) {
-    Serial.print("Corner Sensor: Turn Left");
-    madeAnyDecisions = true;
-    MovementFun::TurnLeft45();
-    MovementFun::Forward();
-  }
-  if (direction == MovementDir::backward)
-  {
-    if (Obj_U_Back < 14)
-    {
-      MovementFun::Forward();
-      madeAnyDecisions = true;
-    }
-  }
-  return madeAnyDecisions;
+  SensorFun::Read_ObjectAvoidance_Sensors();
+  if (Obj_Sharp_Front < 18 || Obj_IR_FL == 0 || Obj_IR_FR == 0 || Obj_U_Back < 14) {
+    // Object detected, stop movement
+    return true;
+  } 
+  // No object detected
+  return false;
 }
 
-unsigned long timerLimit = 2000;
-Timer keepSearchingTimer;
-MovementDir sweepDirection;
-
-int numOfSweep = 0;
-bool isLineClose = false;
-
-inline bool LineTrackingLogic() {
-  bool madeAnyDecisions = false;
- // SensorFun::Read_LineTracking_Sensors(); // new
-
-  // Line following logic
-  if (Line_IR_Left || Line_IR_Middle || Line_IR_Right) {
-    Serial.println("found Line");
-    madeAnyDecisions = true;
-    isLineClose = true;
-    keepSearchingTimer.m_ResetSetting();
-    if (Line_IR_Middle == HIGH) {
-      // On the line
-      // sweepDirection = MovementDir::forward;
-      sweepDirection = MovementDir::forward;
-      MovementFun::Forward();
-      numOfSweep = 0;
-    }
-
-    else if (Line_IR_Right == HIGH) {
-      // Turn right
-      sweepDirection = MovementDir::turnR;
-      MovementFun::TurnRight(10);
-      numOfSweep = 0;
-    } else if (Line_IR_Left == HIGH) {
-      // Turn left
-      sweepDirection = MovementDir::turnL;
-      MovementFun::TurnLeft();
-      numOfSweep = 0;
-    }
-  } else {
-    if (isLineClose) {
-      Serial.print("SEARCHING:");
-      keepSearchingTimer.m_Start();
-      if (!keepSearchingTimer.m_TimerDone(timerLimit)) {
-        keepSearchingTimer.m_Print();
-        madeAnyDecisions = true;
-        if (sweepDirection == MovementDir::turnL) {
-          MovementFun::TurnLeft();
-        } else {
-          MovementFun::TurnRight(10);
-        }
-      } else {
-        Serial.println("Done");
-        isLineClose = false;
-      }
-    } else {
-      Serial.println("nothing");
-      keepSearchingTimer.m_ResetSetting();
-    }
-
-    return madeAnyDecisions;
-    // Lost the line - you can add additional logic or routines here
-    // if (numOfSweep < 2){
-    //   if(timer > timerLimit){
-    //     if (numOfSweep < 1){
-
-    //     }
-    //     MovementFun::TurnRight();
-    //     numOfSweep++;
-    //     timer = 0.0;
-    //   }
-    //   timer += 1.0;
-    // }
+// Function to change the color and brightness of the LED
+void changeLedColor(CRGB color, uint8_t brightness = BRIGHTNESS) {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = color;                // Set the LED color
   }
+  FastLED.setBrightness(brightness); // Set the brightness
+  FastLED.show();                   // Update the LED with the new color and brightness
 }
 
 // ---------------------------------------------------------
@@ -378,98 +95,203 @@ inline bool LineTrackingLogic() {
 
 void setup() {
   Serial.begin(9600);
-
   // Initialize motor pins as outputs
   MovementFun::Init();
-
-  // -----------------------------------
-
+  // Initialize LEDs
+  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS); // Initialize FastLED
+  FastLED.setBrightness(BRIGHTNESS); // Set the initial brightness
+  changeLedColor(CRGB::Black, 0);  // Set to black with brightness 0
+  // Initialize sensor pins
   SensorFun::Init();
-
   Serial.println("-------------");
   Serial.println("Starting Program");
   Serial.println("-------------");
-
-
-  MovementFun::Forward();
-  EdgeAvoidanceLogic();
+  // Set the button pin as input
+  pinMode(32, INPUT_PULLUP);
 }
 
-Timer edgeDetectionDelay;
-unsigned long edgeDetectionDelayTimeLimit = 1500.0;
-bool edgeDetectionDelayDone = true;
+bool robotActive = false;
+
 void loop() {
-
-  // ReadAllSonicSensors();
-  // SensorFun::Read_EdgeAvoidance_BackSensors();
-  // SensorFun::Read_EdgeAvoidance_FrontSensors();
-  // SensorFun::Read_ObjectAvoidance_Sensors();
-
-  // SensorFun::Print(false, true, false);
-  
-
-  // ProtocolInterface test1(ProtocolTypes::ObjectAvoidance);
-  // String test = "Hello World";
-  // Serial.print("testing String: ");
-  // Serial.println(test.c_str());
-
-  // Change to false to only print sensor output and disable output
-  int counter = 0;
-  if (true) {
-    
-    // MovementFun::TurnLeft45();
-    // if (FlameTrackingLogic()){
-    //   Serial.print(F_Flame_IR);
-    // }
-    bool FlameDetected = FlameTrackingLogic();
-     Serial.print(F_Flame_IR);
-     Serial.print("\n");
-     Serial.print(R_Flame_IR);
-     Serial.print("\n");
-     Serial.print(L_Flame_IR);
-     delay(1000);
-
-    // --------- new comments below ------------
-    
-    // MovementDir dircheck;
-    // bool EdgeAvoidanceHappened = EdgeAvoidanceLogic(); 
-    // dircheck = direction;
-    // bool ObjectAvoidanceHappened = ObjectAvoidanceLogic(); 
-    // Serial.print(Obj_U_Back);
-    // if((dircheck == MovementDir::turnL && direction == MovementDir::turnR) || (dircheck == MovementDir::turnR && direction == MovementDir::turnL))
-    // {
-    //   counter++;
-    // }
-    // if (counter >= 3) {
-    //  MovementFun::Backward();
-    //  counter = 0;
-    // }
-    // if ( (!EdgeAvoidanceHappened) && (!ObjectAvoidanceHappened) ) {
-    //   if (edgeDetectionDelayDone) { // lower delay
-    //     if (!LineTrackingLogic()) {
-    //       if ((direction == MovementDir::turnR) || (direction == MovementDir::turnL)) {
-    //         MovementFun::Forward();
-    //       }
-    //     }
-    //   }
-    //   else {
-    //     edgeDetectionDelay.m_Start();
-    //     if (edgeDetectionDelay.m_TimerDone(edgeDetectionDelayTimeLimit)) {
-    //       edgeDetectionDelay.m_ResetSetting();
-    //       edgeDetectionDelayDone = true;
-    //     }
-    //   }
-    // }
-    // else {
-    //   edgeDetectionDelayDone = false;
-    //   edgeDetectionDelay.m_ResetSetting();
-    // }
-    // CheckFrontSensor();
-    
-    
+  // Update robot state
+  int buttonState = digitalRead(32);
+  if(buttonState != lastButtonState) {
+    if(buttonState == HIGH) {
+      robotActive = !robotActive;
+      if(robotActive) {
+        Serial.println("Robot is now active. Awaiting command...");
+        changeLedColor(CRGB::Green);
+      }
+      else {
+        Serial.println("Robot is now inactive. Stopping...");
+        MovementFun::Stop();
+        changeLedColor(CRGB::Red);
+      }
+    }
+    delay(10);
+  }
+  lastButtonState = buttonState;
+  // Read GPIO signals from Raspberry Pi for movement control
+  int rightSignal = digitalRead(RightGPIO);
+  int leftSignal = digitalRead(LeftGPIO);
+  int backwardSignal = digitalRead(BackwardGPIO);
+  int forwardSignal = digitalRead(ForwardGPIO);
+  // Check sensor readings
+  SensorFun::Read_EdgeAvoidance_FrontSensors();
+  SensorFun::Read_EdgeAvoidance_BackSensors();
+  // React to sensor readings and user signals
+  bool objectDetected = ObjectAvoidanceLogic();
+  bool edgeDetected = EdgeAvoidanceLogic();
+  if (robotActive && objectDetected) {
+    // If an obstacle or edge is detected, stop movement in that direction
+    MovementFun::Stop();
+    //Serial.println("Object Detected ");
+    SensorFun::PrintObjectDetection();
+    if (Obj_Sharp_Front < 18 && Obj_IR_FL == 0 && Obj_IR_FR == 0) {
+      if (backwardSignal == HIGH) {
+        // If backward signal is received, move backward
+        MovementFun::Backward();
+      }
+    }
+    else if (Obj_Sharp_Front < 18 && Obj_IR_FL == 0) {
+      if (rightSignal == HIGH) {
+        MovementFun::TurnRight45();
+        Serial.println("Front left object detected, turning right");
+      }
+      else if (backwardSignal == HIGH) {
+        MovementFun::Backward();
+        Serial.println("Front left object detected, moving backward");
+      }      
+    }
+    else if (Obj_Sharp_Front < 18 && Obj_IR_FR == 0) {
+      if (leftSignal == HIGH) {
+        MovementFun::TurnLeft45();
+        Serial.println("Front right object detected, turning left");
+      }
+      else if (backwardSignal == HIGH) {
+        MovementFun::Backward();
+        Serial.println("Front right object detected, moving backward");
+      }      
+    }
+    else if (Obj_Sharp_Front < 18) {
+      if (leftSignal == HIGH) {
+        MovementFun::TurnLeft45();
+        Serial.println("Object detected in the front, turning left");
+      }
+      else if (backwardSignal == HIGH) {
+        MovementFun::Backward();
+        Serial.println("Object detected in the frontd, moving backward");
+      }  
+      else if (rightSignal == HIGH) {
+        MovementFun::TurnRight45();
+        Serial.println("Object detected in the front, turning right");
+      }            
+    }
+    else if (Obj_IR_FR == 0) {
+      if (leftSignal == HIGH) {
+        MovementFun::TurnLeft45();
+        Serial.println("Front right object detected, turning left");
+      }
+      else if (backwardSignal == HIGH) {
+        MovementFun::Backward();
+        Serial.println("Front right object detected, moving backward");
+      }              
+    }
+    else if (Obj_IR_FL == 0) {
+      if (rightSignal == HIGH) {
+        MovementFun::TurnRight45();
+        Serial.println("Front left object detected, turning right");
+      }
+      else if (backwardSignal == HIGH) {
+        MovementFun::Backward();
+        Serial.println("Front left object detected, moving backward");
+      }              
+    }
+    else if (Obj_U_Back < 14) {
+      if (backwardSignal == HIGH) {
+        MovementFun::Stop();
+        Serial.println("Object detected in the back, stopping");
+      }              
+    }             
+  }
+  else if (robotActive && edgeDetected){
+    MovementFun::Stop();
+    // Serial.println("Edge Detected ");
+    SensorFun::PrintEdgeDetection();
+    if (CheckSensorVal(Edge_U_FL) && CheckSensorVal(Edge_U_FR)) {
+      if (backwardSignal == HIGH) {
+        // If backward signal is received, move backward
+        MovementFun::Backward();
+      }
+      else if (CheckSensorVal(Edge_U_FL)) {
+        // Front left edge detected, move backward or turn right if a signal is received
+        if (rightSignal == HIGH) {
+          MovementFun::TurnRight45();
+          Serial.println("Front left edge detected, turning right");
+        }
+        else if (backwardSignal == HIGH) {
+          MovementFun::Backward();
+          Serial.println("Front left edge detected, moving backward");
+        }
+      }
+      else if (CheckSensorVal(Edge_U_FR)) {
+        // Front right edge detected, move backward or turn left if a signal is received
+        if (leftSignal == HIGH) {
+          MovementFun::TurnLeft45();
+          Serial.println("Front right edge detected, turning left");
+        }
+        else if (backwardSignal == HIGH) {
+          MovementFun::Backward();
+          Serial.println("Front right edge detected, moving backward");
+        }
+      }
+    }
+    if (CheckSensorVal(Edge_U_BL) && CheckSensorVal(Edge_U_BR)) {
+      if (forwardSignal == HIGH) {
+        // If backward signal is received, move backward
+        MovementFun::Forward();
+      }
+      else if (CheckSensorVal(Edge_U_BL)) {
+        // Front left edge detected, move backward or turn right if a signal is received
+        if (rightSignal == HIGH) {
+          MovementFun::TurnRight45();
+          Serial.println("Back left edge detected, turning right");
+        }
+        else if (forwardSignal == HIGH) {
+          MovementFun::Forward();
+          Serial.println("Back left edge detected, moving forward");
+        }
+      }
+      else if (CheckSensorVal(Edge_U_BR)) {
+        // Front right edge detected, move backward or turn left if a signal is received
+        if (leftSignal == HIGH) {
+          MovementFun::TurnLeft45();
+          Serial.println("Back right edge detected, turning left");
+        }
+        else if (forwardSignal == HIGH) {
+          MovementFun::Forward();
+          Serial.println("Back right edge detected, moving forward");
+        }
+      }
+    }
   }
   else {
-    
-    // MovementFun::Stop();
+    // If no obstacle or edge is detected, react to user signals
+    if (rightSignal == HIGH && robotActive) {
+      MovementFun::TurnRight45();
+      Serial.println("Turning right");
+    } 
+    if (leftSignal == HIGH && robotActive) {
+      MovementFun::TurnLeft45();
+      Serial.println("Turning left");
+    } 
+    if (backwardSignal == HIGH && robotActive) {
+      MovementFun::Backward();
+      Serial.println("Moving Back");
+    } 
+    if (forwardSignal == HIGH && robotActive) {
+      MovementFun::Forward();
+      Serial.println("Moving Forward");
+    }
   }
 }
