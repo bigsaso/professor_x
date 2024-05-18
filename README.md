@@ -1,9 +1,9 @@
 # Electroencephalographic Control of a Weelchair (Capstone Project)
 
 This repository contains:
-- The MATLAB code for signal acquisition and pre-processing - by Alexander Zwegers;
+- The MATLAB code for signal acquisition and pre-processing - by Alexander Zwegers ([@AlexZ51](https://www.github.com/AlexZ51));
 - The C++ code for signal processing, feature extraction, and classification - by Salvatore Logozzo ([@bigsaso](https://www.github.com/bigsaso));
-- The Python code used for training the model, achieving an accuracy of 93% - by Ibrahim Butt;
+- The Python code used for training the model, achieving an accuracy of 93% - by Ibrahim Butt ([@ibz101](https://www.github.com/ibz101));
 - The Arduino code for controlling the robot - By Annas Ghani ([@AnnazG](https://www.github.com/AnnazG)).
 
 # Raspberry Pi Setup and C++ Project Configuration
